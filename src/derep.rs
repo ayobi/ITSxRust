@@ -58,7 +58,7 @@ pub fn derep_and_write_fasta(
     let mut w = fasta::open_writer(out_fasta)?;
     let mut rep_to_members: HashMap<String, Vec<String>> = HashMap::with_capacity(unique);
 
-    for (_key, (rep_id, rep_seq, members)) in &groups {
+    for (rep_id, rep_seq, members) in groups.values() {
         fasta::write_fasta_record(&mut w, rep_id, rep_seq)?;
         rep_to_members.insert(rep_id.clone(), members.clone());
     }

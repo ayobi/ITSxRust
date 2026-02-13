@@ -170,6 +170,7 @@ struct RegionOutput {
 // Skip handling
 // ---------------------------------------------------------------------------
 
+#[allow(clippy::too_many_arguments)]
 fn handle_skip(
     rec: &Record,
     topk_map: &HashMap<String, TopKHits>,

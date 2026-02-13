@@ -52,8 +52,8 @@ impl FastaReader {
                     return Ok(None);
                 }
                 let line = self.buf.trim_end();
-                if line.starts_with('>') {
-                    let header = line[1..].trim();
+                if let Some(stripped) = line.strip_prefix('>') {
+                    let header = stripped.trim();
                     let id = header
                         .split_whitespace()
                         .next()
@@ -76,8 +76,8 @@ impl FastaReader {
                 break;
             }
             let line = self.buf.trim_end();
-            if line.starts_with('>') {
-                let header = line[1..].trim();
+            if let Some(stripped) = line.strip_prefix('>') {
+                let header = stripped.trim();
                 let next_id = header
                     .split_whitespace()
                     .next()

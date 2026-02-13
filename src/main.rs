@@ -290,6 +290,7 @@ impl AnchorHitOut {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn write_anchor_tsv_row<W: Write>(
     w: &mut W,
     rid: &str,
@@ -328,6 +329,7 @@ fn write_anchor_tsv_row<W: Write>(
     Ok(())
 }
 
+#[allow(clippy::too_many_arguments)]
 fn write_anchor_jsonl_row<W: Write>(
     w: &mut W,
     rid: &str,

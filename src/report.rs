@@ -88,20 +88,12 @@ pub struct SkipCounter {
 }
 
 impl SkipCounter {
-    pub fn new() -> Self {
-        Self::default()
-    }
-
     pub fn record(&mut self, reason: &SkipReason) {
         *self.counts.entry(reason.code().to_string()).or_insert(0) += 1;
     }
 
     pub fn to_map(&self) -> HashMap<String, usize> {
         self.counts.clone()
-    }
-
-    pub fn total(&self) -> usize {
-        self.counts.values().sum()
     }
 }
 

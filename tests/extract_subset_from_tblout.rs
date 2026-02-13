@@ -42,13 +42,13 @@ fn read_fasta_as_map(path: &std::path::Path) -> HashMap<String, String> {
     let mut seq = String::new();
 
     for line in text.lines() {
-        if line.starts_with('>') {
+        if let Some(stripped) = line.strip_prefix('>') {
             if let Some(id) = cur_id.take() {
                 map.insert(id, seq.clone());
             }
             seq.clear();
             // output header is like "READ|region:..." -> store by READ
-            let header = line[1..].split_whitespace().next().unwrap();
+            let header = stripped.split_whitespace().next().unwrap();
             let rid = header.split('|').next().unwrap().to_string();
             cur_id = Some(rid);
         } else {

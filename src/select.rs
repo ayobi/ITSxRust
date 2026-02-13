@@ -122,7 +122,7 @@ fn to_anchor_hits(hits: &[TblHit]) -> Vec<HitIvl> {
 }
 
 /// Sort by score desc, then evalue asc, keep top K
-fn top_k<'a>(mut v: Vec<&'a HitIvl>, k: usize) -> Vec<&'a HitIvl> {
+fn top_k(mut v: Vec<&HitIvl>, k: usize) -> Vec<&HitIvl> {
     v.sort_by(|a, b| {
         b.score
             .partial_cmp(&a.score)
@@ -468,82 +468,6 @@ fn count_anchors(ah: &[HitIvl]) -> AnchorCounts {
         }
     }
     c
-}
-
-/// Public: explain why a read likely failed to yield bounds.
-pub fn diagnose(
-    hits: &[TblHit],
-    region: Region,
-    max_per_anchor: usize,
-    constraints: Constraints,
-) -> String {
-    let ah = to_anchor_hits(hits);
-    if ah.is_empty() {
-        return "no classified anchor hits (none of SSU_end/58S/LSU matched)".to_string();
-    }
-
-    let counts = count_anchors(&ah);
-
-    let missing = {
-        let mut v = Vec::new();
-        let has_ssu = counts.ssu_p + counts.ssu_m > 0;
-        let has_s58s = counts.s58s_p + counts.s58s_m > 0;
-        let has_s58e = counts.s58e_p + counts.s58e_m > 0;
-        let has_lsu = counts.lsu_p + counts.lsu_m > 0;
-
-        if !has_ssu {
-            v.push(anchor_name(Anchor::SsuEnd));
-        }
-        if !has_s58s {
-            v.push(anchor_name(Anchor::S58Start));
-        }
-        if !has_s58e {
-            v.push(anchor_name(Anchor::S58End));
-        }
-        if !has_lsu {
-            v.push(anchor_name(Anchor::LsuStart));
-        }
-        v
-    };
-
-    let counts_str = format!(
-        "counts(+/-): SSU_end {}/{}  58S_start {}/{}  58S_end {}/{}  LSU_start {}/{}",
-        counts.ssu_p,
-        counts.ssu_m,
-        counts.s58s_p,
-        counts.s58s_m,
-        counts.s58e_p,
-        counts.s58e_m,
-        counts.lsu_p,
-        counts.lsu_m
-    );
-
-    if !missing.is_empty() {
-        return format!("missing anchors: {} | {}", missing.join(","), counts_str);
-    }
-
-    // anchors exist; do we have a valid chain under constraints?
-    let chain = compute_chain(hits, max_per_anchor, constraints);
-    if chain.is_none() {
-        return format!(
-            "anchors present but no valid SSU_endâ†’58S_startâ†’58S_endâ†’LSU_start chain under constraints | {}",
-            counts_str
-        );
-    }
-
-    let chain = chain.unwrap();
-    if bounds_from_chain(&chain, region).is_none() {
-        return format!(
-            "chain found, but requested region {:?} bounds invalid (start>end) | {}",
-            region, counts_str
-        );
-    }
-
-    // If we reach here, bounds *should* exist; this typically means downstream trimming failed (seq shorter than bounds).
-    format!(
-        "bounds exist logically but trimming failed (likely bounds exceed sequence length) | {}",
-        counts_str
-    )
 }
 
 /// Structured version of `diagnose` returning a machine-readable `SkipReason`.
