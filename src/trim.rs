@@ -2,7 +2,7 @@
 //
 // Unified record representation and trimming/writing logic.
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use std::collections::HashMap;
 use std::io::{BufWriter, Write};
 use std::path::Path;
@@ -94,9 +94,7 @@ impl SeqWriter {
             SeqWriter::Fasta(w) => fasta::write_fasta_record(w, id, seq_data),
             SeqWriter::Fastq(w) => {
                 let q = qual.ok_or_else(|| {
-                    anyhow!(
-                        "FASTQ output requires quality scores (cannot convert FASTA to FASTQ)"
-                    )
+                    anyhow!("FASTQ output requires quality scores (cannot convert FASTA to FASTQ)")
                 })?;
                 fastq::write_fastq_record(w, id, seq_data, q)
             }

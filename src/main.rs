@@ -11,7 +11,7 @@ mod seq;
 mod tblout;
 mod trim;
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use clap::{Parser, Subcommand, ValueEnum};
 use rayon::prelude::*;
 use serde::Serialize;
@@ -434,9 +434,7 @@ fn main() -> Result<()> {
             let (default_conf_score, default_conf_evalue) = preset::default_confidence();
 
             // Helper: resolve a param with priority: explicit CLI > preset > hardcoded default
-            let preset_constraints = preset_params
-                .as_ref()
-                .and_then(|p| p.constraints.as_ref());
+            let preset_constraints = preset_params.as_ref().and_then(|p| p.constraints.as_ref());
 
             let eff_inc_e = inc_e
                 .or(preset_params.as_ref().and_then(|p| p.inc_e))
@@ -512,7 +510,7 @@ fn main() -> Result<()> {
                     return Err(anyhow!(
                         "Invalid --region '{}'. Use full|its1|its2|all",
                         other
-                    ))
+                    ));
                 }
             };
             let is_all = matches!(region_enum, select::Region::All);
@@ -521,11 +519,20 @@ fn main() -> Result<()> {
                 "Params: in={:?} out={:?} region={} max_per_anchor={} derep={} inc_e={:.1e} \
                  its1=[{}..{}] its2=[{}..{}] full=[{}..{}] \
                  confidence: min_score={:.1} max_evalue={:.1e}",
-                in_fmt, out_fmt, region, eff_max_per_anchor, derep, eff_inc_e,
-                eff_constraints.min_its1, eff_constraints.max_its1,
-                eff_constraints.min_its2, eff_constraints.max_its2,
-                eff_constraints.min_full, eff_constraints.max_full,
-                eff_min_anchor_score, eff_max_anchor_evalue,
+                in_fmt,
+                out_fmt,
+                region,
+                eff_max_per_anchor,
+                derep,
+                eff_inc_e,
+                eff_constraints.min_its1,
+                eff_constraints.max_its1,
+                eff_constraints.min_its2,
+                eff_constraints.max_its2,
+                eff_constraints.min_full,
+                eff_constraints.max_full,
+                eff_min_anchor_score,
+                eff_max_anchor_evalue,
             );
 
             // Anchor output writers
@@ -536,15 +543,41 @@ fn main() -> Result<()> {
             if let Some(w) = tsv_w.as_mut() {
                 let header = [
                     "read_id",
-                    "ssu_model", "ssu_strand", "ssu_start", "ssu_end", "ssu_score", "ssu_evalue",
-                    "s58s_model", "s58s_strand", "s58s_start", "s58s_end", "s58s_score", "s58s_evalue",
-                    "s58e_model", "s58e_strand", "s58e_start", "s58e_end", "s58e_score", "s58e_evalue",
-                    "lsu_model", "lsu_strand", "lsu_start", "lsu_end", "lsu_score", "lsu_evalue",
-                    "full_start", "full_end",
-                    "its1_start", "its1_end",
-                    "its2_start", "its2_end",
-                    "selected_region", "selected_start", "selected_end",
-                    "confidence", "ambiguous_reason",
+                    "ssu_model",
+                    "ssu_strand",
+                    "ssu_start",
+                    "ssu_end",
+                    "ssu_score",
+                    "ssu_evalue",
+                    "s58s_model",
+                    "s58s_strand",
+                    "s58s_start",
+                    "s58s_end",
+                    "s58s_score",
+                    "s58s_evalue",
+                    "s58e_model",
+                    "s58e_strand",
+                    "s58e_start",
+                    "s58e_end",
+                    "s58e_score",
+                    "s58e_evalue",
+                    "lsu_model",
+                    "lsu_strand",
+                    "lsu_start",
+                    "lsu_end",
+                    "lsu_score",
+                    "lsu_evalue",
+                    "full_start",
+                    "full_end",
+                    "its1_start",
+                    "its1_end",
+                    "its2_start",
+                    "its2_end",
+                    "selected_region",
+                    "selected_start",
+                    "selected_end",
+                    "confidence",
+                    "ambiguous_reason",
                 ]
                 .join("\t");
                 writeln!(w, "{}", header)?;
@@ -604,10 +637,7 @@ fn main() -> Result<()> {
                         InputFormat::Fastq => {
                             let td = tempdir()?;
                             let tmp_fa = td.path().join("target.fasta");
-                            eprintln!(
-                                "Converting FASTQ -> FASTA for nhmmer: {}",
-                                tmp_fa.display()
-                            );
+                            eprintln!("Converting FASTQ -> FASTA for nhmmer: {}", tmp_fa.display());
 
                             let mut r = fastq::FastqReader::new(&input)?;
                             let mut w = fasta::open_writer(&tmp_fa)?;
@@ -737,7 +767,9 @@ fn main() -> Result<()> {
                     if plans.full.is_some() || plans.its1.is_some() || plans.its2.is_some() {
                         bounds_map_all.insert(cr.rid.clone(), plans);
                     }
-                } else if let Some(plan) = mk_plan(cr.selected, cr.strand, cr.seq_len, cr.confidence) {
+                } else if let Some(plan) =
+                    mk_plan(cr.selected, cr.strand, cr.seq_len, cr.confidence)
+                {
                     bounds_map_one.insert(cr.rid.clone(), plan);
                 }
 
@@ -801,7 +833,8 @@ fn main() -> Result<()> {
                 .filter(|(rid, _)| !full_chain_rids.contains(rid))
                 .filter_map(|(rid, tk)| {
                     let hs = tk.flatten();
-                    let pb = select::compute_partial_bounds(&hs, eff_max_per_anchor, eff_constraints);
+                    let pb =
+                        select::compute_partial_bounds(&hs, eff_max_per_anchor, eff_constraints);
                     if pb.has_any() {
                         Some((rid.clone(), pb))
                     } else {
@@ -819,24 +852,48 @@ fn main() -> Result<()> {
                         full: pb.full.as_ref().map(|p| ExtractPlan {
                             norm_start: p.start,
                             norm_end: p.end,
-                            orig_start: if p.strand == '+' { p.start } else { p.seq_len - p.end + 1 },
-                            orig_end: if p.strand == '+' { p.end } else { p.seq_len - p.start + 1 },
+                            orig_start: if p.strand == '+' {
+                                p.start
+                            } else {
+                                p.seq_len - p.end + 1
+                            },
+                            orig_end: if p.strand == '+' {
+                                p.end
+                            } else {
+                                p.seq_len - p.start + 1
+                            },
                             strand: p.strand,
                             confidence,
                         }),
                         its1: pb.its1.as_ref().map(|p| ExtractPlan {
                             norm_start: p.start,
                             norm_end: p.end,
-                            orig_start: if p.strand == '+' { p.start } else { p.seq_len - p.end + 1 },
-                            orig_end: if p.strand == '+' { p.end } else { p.seq_len - p.start + 1 },
+                            orig_start: if p.strand == '+' {
+                                p.start
+                            } else {
+                                p.seq_len - p.end + 1
+                            },
+                            orig_end: if p.strand == '+' {
+                                p.end
+                            } else {
+                                p.seq_len - p.start + 1
+                            },
                             strand: p.strand,
                             confidence,
                         }),
                         its2: pb.its2.as_ref().map(|p| ExtractPlan {
                             norm_start: p.start,
                             norm_end: p.end,
-                            orig_start: if p.strand == '+' { p.start } else { p.seq_len - p.end + 1 },
-                            orig_end: if p.strand == '+' { p.end } else { p.seq_len - p.start + 1 },
+                            orig_start: if p.strand == '+' {
+                                p.start
+                            } else {
+                                p.seq_len - p.end + 1
+                            },
+                            orig_end: if p.strand == '+' {
+                                p.end
+                            } else {
+                                p.seq_len - p.start + 1
+                            },
                             strand: p.strand,
                             confidence,
                         }),
@@ -857,8 +914,16 @@ fn main() -> Result<()> {
                         let plan = ExtractPlan {
                             norm_start: p.start,
                             norm_end: p.end,
-                            orig_start: if p.strand == '+' { p.start } else { p.seq_len - p.end + 1 },
-                            orig_end: if p.strand == '+' { p.end } else { p.seq_len - p.start + 1 },
+                            orig_start: if p.strand == '+' {
+                                p.start
+                            } else {
+                                p.seq_len - p.end + 1
+                            },
+                            orig_end: if p.strand == '+' {
+                                p.end
+                            } else {
+                                p.seq_len - p.start + 1
+                            },
                             strand: p.strand,
                             confidence,
                         };
@@ -929,7 +994,11 @@ fn main() -> Result<()> {
                     &topk_map,
                     &mut skipped_writer,
                     &mut ambiguous_writer,
-                    if filter_ambiguous { Some(&ambiguous_ids) } else { None },
+                    if filter_ambiguous {
+                        Some(&ambiguous_ids)
+                    } else {
+                        None
+                    },
                     diag_region,
                     eff_max_per_anchor,
                     eff_constraints,
@@ -942,7 +1011,13 @@ fn main() -> Result<()> {
                 eprintln!("  {}", p_its2.display());
                 eprintln!(
                     "Kept (reads with any region): {} | full: {} | its1: {} | its2: {} | partial: {} | ambiguous_out: {} | skipped: {}",
-                    s.kept_any, s.kept_full, s.kept_its1, s.kept_its2, n_partial, s.ambiguous_out, s.skipped
+                    s.kept_any,
+                    s.kept_full,
+                    s.kept_its1,
+                    s.kept_its2,
+                    n_partial,
+                    s.ambiguous_out,
+                    s.skipped
                 );
                 s
             } else {
@@ -955,7 +1030,11 @@ fn main() -> Result<()> {
                     &topk_map,
                     &mut skipped_writer,
                     &mut ambiguous_writer,
-                    if filter_ambiguous { Some(&ambiguous_ids) } else { None },
+                    if filter_ambiguous {
+                        Some(&ambiguous_ids)
+                    } else {
+                        None
+                    },
                     diag_region,
                     eff_max_per_anchor,
                     eff_constraints,

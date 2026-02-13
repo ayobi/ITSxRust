@@ -1,8 +1,7 @@
-use std::process::Command;
-use std::fs;
-use tempfile::tempdir;
 use std::collections::HashMap;
-
+use std::fs;
+use std::process::Command;
+use tempfile::tempdir;
 
 fn count_fasta_headers(path: &std::path::Path) -> usize {
     fs::read_to_string(path)
@@ -20,10 +19,14 @@ fn extract_subset_full_from_existing_tblout() {
     let status = Command::new(env!("CARGO_BIN_EXE_itsxrust"))
         .args([
             "extract",
-            "--input", "data/subset.fasta",
-            "--tblout-existing", "data/subset.tblout",
-            "--output", out.to_str().unwrap(),
-            "--region", "full",
+            "--input",
+            "data/subset.fasta",
+            "--tblout-existing",
+            "data/subset.tblout",
+            "--output",
+            out.to_str().unwrap(),
+            "--region",
+            "full",
         ])
         .status()
         .unwrap();
@@ -31,7 +34,6 @@ fn extract_subset_full_from_existing_tblout() {
     assert!(status.success());
     assert_eq!(count_fasta_headers(&out), 766);
 }
-
 
 fn read_fasta_as_map(path: &std::path::Path) -> HashMap<String, String> {
     let text = fs::read_to_string(path).unwrap();
@@ -90,10 +92,14 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
     let status = Command::new(env!("CARGO_BIN_EXE_itsxrust"))
         .args([
             "extract",
-            "--input", "data/subset.fasta",
-            "--tblout-existing", "data/subset.tblout",
-            "--output", out.to_str().unwrap(),
-            "--region", "full",
+            "--input",
+            "data/subset.fasta",
+            "--tblout-existing",
+            "data/subset.tblout",
+            "--output",
+            out.to_str().unwrap(),
+            "--region",
+            "full",
         ])
         .status()
         .unwrap();
@@ -108,8 +114,12 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
     let orig_map = read_fasta_as_map(std::path::Path::new("data/subset.fasta"));
     let out_map = read_fasta_as_map(&out);
 
-    let orig = orig_map.get(read_id).expect("read not found in original FASTA");
-    let got = out_map.get(read_id).expect("read not found in extracted FASTA");
+    let orig = orig_map
+        .get(read_id)
+        .expect("read not found in original FASTA");
+    let got = out_map
+        .get(read_id)
+        .expect("read not found in extracted FASTA");
 
     let l = orig.len();
     // map normalized bounds back to original coords (1-based inclusive)
@@ -122,4 +132,3 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
     assert_eq!(got.len(), expected.len());
     assert_eq!(got, &expected);
 }
-

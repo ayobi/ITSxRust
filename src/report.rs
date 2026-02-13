@@ -50,7 +50,10 @@ impl fmt::Display for SkipReason {
         match self {
             SkipReason::NoHmmHits => write!(f, "no HMM hits"),
             SkipReason::NoAnchorHits => {
-                write!(f, "no classified anchor hits (none of SSU_end/58S/LSU matched)")
+                write!(
+                    f,
+                    "no classified anchor hits (none of SSU_end/58S/LSU matched)"
+                )
             }
             SkipReason::MissingAnchors { missing } => {
                 write!(f, "missing anchors: {}", missing.join(","))
@@ -59,10 +62,16 @@ impl fmt::Display for SkipReason {
                 write!(f, "anchors present but no valid chain under constraints")
             }
             SkipReason::InvalidBounds => {
-                write!(f, "chain found but requested region bounds invalid (start>end)")
+                write!(
+                    f,
+                    "chain found but requested region bounds invalid (start>end)"
+                )
             }
             SkipReason::TrimFailed => {
-                write!(f, "bounds valid but trimming failed (bounds exceed sequence length)")
+                write!(
+                    f,
+                    "bounds valid but trimming failed (bounds exceed sequence length)"
+                )
             }
         }
     }

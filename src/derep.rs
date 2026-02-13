@@ -11,10 +11,10 @@ use std::collections::HashMap;
 use std::io::Write;
 use std::path::Path;
 
-use crate::fasta;
-use crate::trim;
-use crate::tblout::TopKHits;
 use crate::InputFormat;
+use crate::fasta;
+use crate::tblout::TopKHits;
+use crate::trim;
 
 /// Result of a dereplication pass.
 pub struct DerepResult {
@@ -76,10 +76,7 @@ pub fn derep_and_write_fasta(
 /// downstream plan computation and trimming sees all original read IDs.
 ///
 /// Hit records for duplicates have their `read_id` updated to the member's ID.
-pub fn expand_topk_map(
-    topk_map: &mut HashMap<String, TopKHits>,
-    derep: &DerepResult,
-) {
+pub fn expand_topk_map(topk_map: &mut HashMap<String, TopKHits>, derep: &DerepResult) {
     let mut additions: Vec<(String, TopKHits)> = Vec::new();
 
     for (rep_id, members) in &derep.rep_to_members {

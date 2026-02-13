@@ -103,7 +103,6 @@ pub fn classify(model: &str) -> Option<Anchor> {
     }
 }
 
-
 fn to_anchor_hits(hits: &[TblHit]) -> Vec<HitIvl> {
     let mut out = Vec::new();
     for h in hits {
@@ -331,8 +330,24 @@ fn best_pair_both_strands(
     max_len: i64,
     max_per_anchor: usize,
 ) -> Option<PairBound> {
-    let plus = best_pair_one_strand(hits, '+', left_anchor, right_anchor, min_len, max_len, max_per_anchor);
-    let minus = best_pair_one_strand(hits, '-', left_anchor, right_anchor, min_len, max_len, max_per_anchor);
+    let plus = best_pair_one_strand(
+        hits,
+        '+',
+        left_anchor,
+        right_anchor,
+        min_len,
+        max_len,
+        max_per_anchor,
+    );
+    let minus = best_pair_one_strand(
+        hits,
+        '-',
+        left_anchor,
+        right_anchor,
+        min_len,
+        max_len,
+        max_per_anchor,
+    );
 
     match (plus, minus) {
         (Some(p), None) => Some(p),
@@ -356,18 +371,30 @@ pub fn compute_partial_bounds(
     let ah = to_anchor_hits(hits);
 
     let its1 = best_pair_both_strands(
-        &ah, Anchor::SsuEnd, Anchor::S58Start,
-        constraints.min_its1, constraints.max_its1, max_per_anchor,
+        &ah,
+        Anchor::SsuEnd,
+        Anchor::S58Start,
+        constraints.min_its1,
+        constraints.max_its1,
+        max_per_anchor,
     );
 
     let its2 = best_pair_both_strands(
-        &ah, Anchor::S58End, Anchor::LsuStart,
-        constraints.min_its2, constraints.max_its2, max_per_anchor,
+        &ah,
+        Anchor::S58End,
+        Anchor::LsuStart,
+        constraints.min_its2,
+        constraints.max_its2,
+        max_per_anchor,
     );
 
     let full = best_pair_both_strands(
-        &ah, Anchor::SsuEnd, Anchor::LsuStart,
-        constraints.min_full, constraints.max_full, max_per_anchor,
+        &ah,
+        Anchor::SsuEnd,
+        Anchor::LsuStart,
+        constraints.min_full,
+        constraints.max_full,
+        max_per_anchor,
     );
 
     PartialBounds { its1, its2, full }
@@ -538,10 +565,18 @@ pub fn diagnose_structured(
     let has_lsu = counts.lsu_p + counts.lsu_m > 0;
 
     let mut missing = Vec::new();
-    if !has_ssu { missing.push(anchor_name(Anchor::SsuEnd).to_string()); }
-    if !has_s58s { missing.push(anchor_name(Anchor::S58Start).to_string()); }
-    if !has_s58e { missing.push(anchor_name(Anchor::S58End).to_string()); }
-    if !has_lsu { missing.push(anchor_name(Anchor::LsuStart).to_string()); }
+    if !has_ssu {
+        missing.push(anchor_name(Anchor::SsuEnd).to_string());
+    }
+    if !has_s58s {
+        missing.push(anchor_name(Anchor::S58Start).to_string());
+    }
+    if !has_s58e {
+        missing.push(anchor_name(Anchor::S58End).to_string());
+    }
+    if !has_lsu {
+        missing.push(anchor_name(Anchor::LsuStart).to_string());
+    }
 
     if !missing.is_empty() {
         return SkipReason::MissingAnchors { missing };
