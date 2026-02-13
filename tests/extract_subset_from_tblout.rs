@@ -20,9 +20,9 @@ fn extract_subset_full_from_existing_tblout() {
         .args([
             "extract",
             "--input",
-            "data/subset.fasta",
+            "testdata/subset.fasta",
             "--tblout-existing",
-            "data/subset.tblout",
+            "testdata/subset.tblout",
             "--output",
             out.to_str().unwrap(),
             "--region",
@@ -93,9 +93,9 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
         .args([
             "extract",
             "--input",
-            "data/subset.fasta",
+            "testdata/subset.fasta",
             "--tblout-existing",
-            "data/subset.tblout",
+            "testdata/subset.tblout",
             "--output",
             out.to_str().unwrap(),
             "--region",
@@ -111,7 +111,7 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
     let full_end: usize = 814;
 
     // Load original and output sequences
-    let orig_map = read_fasta_as_map(std::path::Path::new("data/subset.fasta"));
+    let orig_map = read_fasta_as_map(std::path::Path::new("testdata/subset.fasta"));
     let out_map = read_fasta_as_map(&out);
 
     let orig = orig_map
