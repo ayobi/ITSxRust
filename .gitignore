@@ -1,0 +1,42 @@
+/target
+# --- Rust ---
+/target/
+**/*.rs.bk
+
+# --- OS / editors ---
+.DS_Store
+**/.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# --- Logs ---
+*.log
+
+# --- Large sequencing data ---
+*.fastq
+*.fq
+*.fastq.gz
+*.fq.gz
+*.sra
+*.bam
+*.cram
+
+# --- Generated outputs / scratch ---
+out/
+results*/
+workdir/
+tmp/
+*.tblout
+*.tsv
+*.jsonl
+*.fasta
+*.fa
+*.fna
+*.anchors.tsv
+*.anchors.jsonl
+compare.zip
+compare/
+
+# --- ITSx/HMMER temp dirs ---
+ITSx_temp_directory__*
