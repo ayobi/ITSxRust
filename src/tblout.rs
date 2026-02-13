@@ -106,12 +106,6 @@ pub struct TopKHits {
 }
 
 impl TopKHits {
-    pub fn new() -> Self {
-        Self {
-            bins: std::array::from_fn(|_| Vec::new()),
-        }
-    }
-
     /// Compatibility helper: gather all stored hits into one small Vec
     /// (max size = 8 * K).
     pub fn flatten(&self) -> Vec<TblHit> {
@@ -165,10 +159,10 @@ pub fn stream_topk_tblout(
         };
         total_tblout_hits += 1;
 
-        if let Some(cut) = evalue_cutoff {
-            if hit.evalue > cut {
-                continue;
-            }
+        if let Some(cut) = evalue_cutoff
+            && hit.evalue > cut
+        {
+            continue;
         }
 
         let Some(anchor) = select::classify(&hit.model) else {
@@ -179,7 +173,8 @@ pub fn stream_topk_tblout(
         let rid = hit.read_id.clone();
         let idx = bin_index(anchor, hit.strand);
 
-        let entry = map.entry(rid).or_insert_with(TopKHits::new);
+        let entry = map.entry(rid).or_default();
+
         push_topk(&mut entry.bins[idx], hit, k);
     }
 

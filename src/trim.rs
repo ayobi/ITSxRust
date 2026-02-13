@@ -265,19 +265,19 @@ pub fn trim_all(
             let mut wrote = false;
 
             for (i, maybe_plan) in plan_array.iter().enumerate() {
-                if let Some(plan) = maybe_plan {
-                    if let Some((out_seq, out_qual)) = extract_trimmed(&rec, plan) {
-                        let out_id = trimmed_id(&rec.id, outputs[i].tag, plan);
-                        outputs[i]
-                            .writer
-                            .write_record(&out_id, &out_seq, out_qual.as_deref())?;
-                        wrote = true;
-                        match i {
-                            0 => stats.kept_full += 1,
-                            1 => stats.kept_its1 += 1,
-                            2 => stats.kept_its2 += 1,
-                            _ => unreachable!(),
-                        }
+                if let Some(plan) = maybe_plan
+                    && let Some((out_seq, out_qual)) = extract_trimmed(&rec, plan)
+                {
+                    let out_id = trimmed_id(&rec.id, outputs[i].tag, plan);
+                    outputs[i]
+                        .writer
+                        .write_record(&out_id, &out_seq, out_qual.as_deref())?;
+                    wrote = true;
+                    match i {
+                        0 => stats.kept_full += 1,
+                        1 => stats.kept_its1 += 1,
+                        2 => stats.kept_its2 += 1,
+                        _ => unreachable!(),
                     }
                 }
             }

@@ -182,7 +182,7 @@ fn best_chain_one_strand(
                 continue;
             }
             for c58 in &s58e {
-                if !(b.ivl.start < c58.ivl.start) {
+                if b.ivl.start >= c58.ivl.start {
                     continue;
                 }
                 for d in &lsu {
