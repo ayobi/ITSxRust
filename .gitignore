@@ -40,3 +40,12 @@ compare/
 
 # --- ITSx/HMMER temp dirs ---
 ITSx_temp_directory__*
+
+# Allow small committed fixtures
+!testdata/
+!testdata/**
+!testdata/*.tblout
+!testdata/*.fasta
+!testdata/*.fa
+!testdata/*.fna
+
