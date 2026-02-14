@@ -1,16 +1,32 @@
 # ITSxRust
 
-Fast ITS region extraction in Rust (HMMER-based), designed for long-read amplicon data (ONT / PacBio HiFi) and general FASTA/FASTQ inputs.
+ITS subregion extraction for fungal metabarcoding at long-read scale.
+
+As long-read amplicon sequencing (Oxford Nanopore and PacBio HiFi) becomes routine, extracting ITS subregions (ITS1, 5.8S, ITS2, full ITS) reliably at scale can become a throughput and robustness bottleneck. ITSxRust is a Rust-based ITS extractor that follows the standard approach of locating conserved ribosomal flanks using profile-HMMs (via HMMER), while adding long-read–oriented features for reproducible, high-throughput processing.
 
 ## Features
-- Extract ITS1, ITS2, and/or full ITS region(s)
-- Works with FASTA and FASTQ inputs (optionally gzipped if supported in your build)
-- Produces extracted sequences plus optional boundary/anchor reporting
-- Designed to be fast and reproducible
+- HMMER/profile-HMM–based detection of conserved ribosomal flanks to extract ITS subregions
+- Supports long-read workloads (ONT / HiFi) with built-in parameter presets
+- Optional dereplication to reduce redundant HMMER searches
+- Partial-chain fallback: recover subregions using two-anchor pairs when a full four-anchor chain is unavailable
+- Structured failure diagnostics and QC summaries to help understand why reads were skipped or partially recovered
+- Works with FASTA and FASTQ inputs
 
 ## Install
 
-### From source (developer install)
+### Prebuilt binaries (recommended)
+Download the appropriate binary for your OS from GitHub Releases:
+
+- GitHub → Releases → `v0.1.0`
+
+Then:
+
+```bash
+chmod +x itsxrust
+./itsxrust --help
+```
+
+### From source
 Requires Rust (stable) and Cargo.
 
 ```bash
@@ -25,39 +41,35 @@ cargo install --path .
 itsxrust --help
 ```
 
-### Planned distribution
-The manuscript version will provide:
-- Bioconda recipe
-- Prebuilt binaries (GitHub Releases)
-- Container images (GHCR)
+### Dependency: HMMER
+ITSxRust coordinates HMMER searches (e.g., `hmmscan`) to locate ribosomal flanks. Ensure HMMER is available in your environment for typical extraction workflows.
 
 ## Usage
 
-Basic help:
+Help:
 
 ```bash
 itsxrust --help
 itsxrust extract --help
 ```
 
-Example extraction (adjust flags to match your CLI):
+Example extraction:
 
 ```bash
-itsxrust extract \
-  --input data/example.fastq \
-  --hmm bench/sim/hmmer/F.hmm \
-  --region its2 \
-  --output out_dir/
+itsxrust extract   --input reads.fastq.gz   --hmm path/to/F.hmm   --region its2   --output out_dir/   --hmmer-cpu 8
 ```
 
+Presets (ONT / HiFi) are available via the CLI (see `itsxrust extract --help`).
+
 ## Inputs / Outputs
+
 **Inputs**
-- FASTA / FASTQ
-- HMM model file (HMMER)
+- FASTA / FASTQ (optionally gzipped)
+- HMM model file (profile-HMMs for ribosomal flanks)
 
 **Outputs**
-- FASTA of extracted regions (e.g. ITS1 / ITS2 / full)
-- Optional tables/JSONL with anchors/boundaries (if enabled)
+- FASTA of extracted regions (ITS1 / ITS2 / full)
+- Optional anchor/boundary outputs (TSV/JSONL) and QC summaries (if enabled)
 
 ## Development
 
@@ -69,7 +81,7 @@ cargo clippy --all-targets --all-features -- -D warnings
 cargo test
 ```
 
-Benchmarks & scripts live in `bench/`.
+Benchmarks and simulation scripts live in `bench/`.
 
 ## Project layout
 - `src/` Rust source
@@ -80,8 +92,12 @@ Benchmarks & scripts live in `bench/`.
 
 Large datasets and generated outputs should stay untracked.
 
+## Roadmap
+- Container images (GHCR)
+- Bioconda recipe
+
 ## License
 MIT (see `LICENSE`).
 
 ## Citation
-A `CITATION.cff` will be added for the public release.
+If you use ITSxRust, please cite the repository metadata via GitHub’s “Cite this repository” button (powered by `CITATION.cff`).
