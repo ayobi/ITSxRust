@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it."
+title: "ITSxRust"
+type: software
+authors:
+  - family-names: "O'Brien"
+    given-names: "Aaron"
+license: "MIT"
+repository-code: "https://github.com/ayobi/ITSxRust"
+url: "https://github.com/ayobi/ITSxRust"
+version: "0.1.0"
+date-released: "2026-02-13"
+keywords:
+  - ITS
+  - fungi
+  - bioinformatics
+  - nanopore
+  - PacBio
+  - amplicon
+preferred-citation:
+  type: software
+  authors:
+    - family-names: "O'Brien"
+      given-names: "Aaron"
+  title: "ITSxRust"
+  version: "0.1.0"
+  date-released: "2026-02-13"
+  url: "https://github.com/ayobi/ITSxRust"
+  repository-code: "https://github.com/ayobi/ITSxRust"
