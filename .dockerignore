@@ -1,0 +1,17 @@
+cat > .dockerignore <<'EOF'
+# Ignore everything at repo root
+*
+
+# Keep docker config
+!Dockerfile
+!.dockerignore
+
+# Keep Rust build inputs
+!Cargo.toml
+!Cargo.lock
+!src/
+!src/**
+!build.rs
+!.cargo/
+!.cargo/**
+EOF
