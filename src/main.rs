@@ -42,7 +42,11 @@ pub enum Preset {
 }
 
 #[derive(Parser, Debug)]
-#[command(name = "itsxrust", version, about = "ITS region extractor for long-read amplicon sequencing")]
+#[command(
+    name = "itsxrust",
+    version,
+    about = "ITS region extractor for long-read amplicon sequencing"
+)]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
