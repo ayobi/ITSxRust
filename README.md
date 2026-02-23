@@ -54,6 +54,14 @@ This produces `results/sample1.its1.fasta`, `results/sample1.its2.fasta`, and `r
 
 ## Install
 
+### Bioconda (recommended)
+
+ITSxRust is available on [Bioconda](https://bioconda.github.io/). This is the easiest way to install, as it also handles the HMMER dependency:
+
+```bash
+conda install -c bioconda -c conda-forge itsxrust
+```
+
 ### Prebuilt binaries
 
 Download the binary for your platform from [GitHub Releases](https://github.com/ayobi/ITSxRust/releases), then:
@@ -90,7 +98,7 @@ ITSxRust calls `nhmmer` to search profile-HMMs against input sequences. Install 
 conda install -c bioconda hmmer
 ```
 
-The Docker image includes HMMER, so no separate installation is needed when using the container.
+> **Note:** If you installed via Bioconda or Docker, HMMER is already included — no separate installation is needed.
 
 ### HMM profiles
 
@@ -204,7 +212,7 @@ bench/         Benchmarking + simulation harness
 
 ## Roadmap
 
-- Bioconda recipe
+- ~~Bioconda recipe~~ ✅
 - In-process HMM bindings (replace nhmmer subprocess)
 
 ## License

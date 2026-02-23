@@ -49,3 +49,4 @@ ITSx_temp_directory__*
 !testdata/*.fa
 !testdata/*.fna
 
+data/figures/

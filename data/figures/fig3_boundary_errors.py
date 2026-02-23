@@ -65,7 +65,7 @@ def main():
     fig, axes = plt.subplots(2, 3, figsize=(12, 6.5),
                               gridspec_kw={'height_ratios': [1, 1]})
     fig.subplots_adjust(hspace=0.35, wspace=0.28, left=0.07, right=0.97,
-                        top=0.92, bottom=0.08)
+                        top=0.88, bottom=0.08)
 
     # ── Row 1: Box plots (capped at 100bp for visibility) ──
     CAP = 100
@@ -137,8 +137,8 @@ def main():
         if j == 0:
             ax.legend(fontsize=7, loc='lower right', framealpha=0.9)
 
-    fig.suptitle('Boundary accuracy on simulated ONT reads', fontsize=12,
-                 fontweight='bold', y=0.97)
+    fig.suptitle('Boundary accuracy on simulated ONT reads', fontsize=14,
+                 fontweight='bold', y=0.98)
 
     plt.savefig(f'{args.outfile}.pdf', dpi=300, bbox_inches='tight')
     plt.savefig(f'{args.outfile}.png', dpi=300, bbox_inches='tight')
