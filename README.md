@@ -27,17 +27,6 @@ itsxrust extract \
   --hmmer-cpu 8
 ```
 
-Expected output:
-
-```
-Using preset: ont
-Params: in=Fastq out=Fasta region=its2 max_per_anchor=10 derep=false inc_e=1.0e-3 ...
-tblout hits parsed: 142389 | anchor hits: 131052 | stored(topK): 98412 | reads w/anchor hits: 48231
-Reads with computed bounds: 45102 (full-chain: 40811, confident: 38500, ambiguous: 2311, partial: 4291)
-Wrote output: its2_extracted.fasta
-Kept: 45102 (partial: 4291)  Ambiguous (separate): 0  Skipped: 3129
-```
-
 To extract ITS1, ITS2, and full ITS simultaneously, use `--region all`. In this mode, `--output` is treated as a prefix:
 
 ```bash
