@@ -1,4 +1,9 @@
 # ITSxRust
+[![Bioconda](https://img.shields.io/conda/dn/bioconda/itsxrust.svg?label=Bioconda)](https://bioconda.github.io/recipes/itsxrust/README.html)
+[![Conda Version](https://img.shields.io/conda/vn/bioconda/itsxrust.svg)](https://anaconda.org/bioconda/itsxrust)
+[![GitHub Release](https://img.shields.io/github/v/release/ayobi/ITSxRust)](https://github.com/ayobi/ITSxRust/releases)
+[![CI](https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg)](https://github.com/ayobi/ITSxRust/actions)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 ITS subregion extraction for fungal metabarcoding at long-read scale.
 
