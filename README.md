@@ -5,6 +5,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/ayobi/ITSxRust)](https://github.com/ayobi/ITSxRust/releases)
 [![CI](https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg)](https://github.com/ayobi/ITSxRust/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv)](https://doi.org/10.64898/2026.02.25.707950)
 
 ITS subregion extraction for fungal metabarcoding at long-read scale.
 
