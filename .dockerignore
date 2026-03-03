@@ -1,4 +1,3 @@
-cat > .dockerignore <<'EOF'
 # Ignore everything at repo root
 *
 
@@ -14,4 +13,8 @@ cat > .dockerignore <<'EOF'
 !build.rs
 !.cargo/
 !.cargo/**
-EOF
+
+# Keep bundled HMMs
+!data/
+!data/hmm/
+!data/hmm/**
