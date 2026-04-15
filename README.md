@@ -6,10 +6,23 @@
 [![CI](https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg)](https://github.com/ayobi/ITSxRust/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv)](https://doi.org/10.64898/2026.02.25.707950)
+[![nf-core/ampliseq](https://img.shields.io/badge/nf--core-ampliseq-1a9655?logo=nfcore)](https://nf-co.re/ampliseq)
 
 ITS subregion extraction for fungal metabarcoding at long-read scale.
 
 As long-read amplicon sequencing (Oxford Nanopore and PacBio HiFi) becomes routine, extracting ITS subregions (ITS1, 5.8S, ITS2, full ITS) reliably at scale can become a throughput and robustness bottleneck. ITSxRust is a Rust-based ITS extractor that follows the standard approach of locating conserved ribosomal flanks using profile-HMMs (via HMMER), while adding long-read–oriented features for reproducible, high-throughput processing.
+
+## Integration
+
+ITSxRust is integrated into [nf-core/ampliseq](https://nf-co.re/ampliseq) (v2.17.0+) as an alternative ITS extractor alongside [ITSx](https://microbiology.se/software/itsx/). Enable it with:
+
+```bash
+nextflow run nf-core/ampliseq -profile <docker/singularity/conda> \
+  --its_extractor itsxrust \
+  ...
+```
+
+See the [ampliseq documentation](https://nf-co.re/ampliseq) for the full parameter list.
 
 ## Features
 
