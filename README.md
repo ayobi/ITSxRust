@@ -5,6 +5,9 @@
   </picture>
 </p>
 
+---
+<br>
+
 <p align="left">
   <a href="https://bioconda.github.io/recipes/itsxrust/README.html"><img src="https://img.shields.io/conda/dn/bioconda/itsxrust.svg?label=Bioconda" alt="Bioconda"></a>
   <a href="https://anaconda.org/bioconda/itsxrust"><img src="https://img.shields.io/conda/vn/bioconda/itsxrust.svg" alt="Conda Version"></a>
