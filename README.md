@@ -1,12 +1,20 @@
-# ITSxRust
-[![Bioconda](https://img.shields.io/conda/dn/bioconda/itsxrust.svg?label=Bioconda)](https://bioconda.github.io/recipes/itsxrust/README.html)
-[![Conda Version](https://img.shields.io/conda/vn/bioconda/itsxrust.svg)](https://anaconda.org/bioconda/itsxrust)
-[![Docker](https://img.shields.io/badge/Docker-ghcr.io%2Fayobi%2Fitsxrust-blue?logo=docker)](https://github.com/ayobi/ITSxRust/pkgs/container/itsxrust)
-[![GitHub Release](https://img.shields.io/github/v/release/ayobi/ITSxRust)](https://github.com/ayobi/ITSxRust/releases)
-[![CI](https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg)](https://github.com/ayobi/ITSxRust/actions)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![bioRxiv](https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv)](https://doi.org/10.64898/2026.02.25.707950)
-[![nf-core/ampliseq](https://img.shields.io/badge/nf--core-ampliseq-1a9655?logo=nfcore)](https://nf-co.re/ampliseq)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/itsxrust-logo-dark.png">
+    <img alt="ITSxRust" src="assets/itsxrust-logo-dark.png" width="480">
+  </picture>
+</p>
+
+<p align="left">
+  <a href="https://bioconda.github.io/recipes/itsxrust/README.html"><img src="https://img.shields.io/conda/dn/bioconda/itsxrust.svg?label=Bioconda" alt="Bioconda"></a>
+  <a href="https://anaconda.org/bioconda/itsxrust"><img src="https://img.shields.io/conda/vn/bioconda/itsxrust.svg" alt="Conda Version"></a>
+  <a href="https://github.com/ayobi/ITSxRust/pkgs/container/itsxrust"><img src="https://img.shields.io/badge/Docker-ghcr.io%2Fayobi%2Fitsxrust-blue?logo=docker" alt="Docker"></a>
+  <a href="https://github.com/ayobi/ITSxRust/releases"><img src="https://img.shields.io/github/v/release/ayobi/ITSxRust" alt="GitHub Release"></a>
+  <a href="https://github.com/ayobi/ITSxRust/actions"><img src="https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="https://doi.org/10.64898/2026.02.25.707950"><img src="https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv" alt="bioRxiv"></a>
+  <a href="https://nf-co.re/ampliseq"><img src="https://img.shields.io/badge/nf--core-ampliseq-1a9655?logo=nfcore" alt="nf-core/ampliseq"></a>
+</p>
 
 ITS subregion extraction for fungal metabarcoding at long-read scale.
 
