@@ -43,7 +43,7 @@ See the [ampliseq documentation](https://nf-co.re/ampliseq) for the full paramet
 - **Confidence classification** — each extracted read is labelled `confident`, `ambiguous`, or `partial` based on per-anchor score/E-value thresholds; ambiguous reads can be diverted to a separate file with `--write-ambiguous`
 - **Exact dereplication** — `--derep` hashes identical sequences and searches only unique representatives, projecting results back to duplicates
 - **Structured QC output** — `--qc-json` emits a per-sample JSON summary (read counts, skip-reason breakdown, parameters) suitable for MultiQC ingestion; `--anchors-tsv` / `--anchors-jsonl` export per-read anchor coordinates and confidence labels
-- **Multi-region output** — extract ITS1, ITS2, full ITS, or all three simultaneously (`--region all`)
+- **Multi-region output** — extract ITS1, ITS2, full ITS, all three simultaneously (`--region all`), or the flanking SSU/LSU portions captured in the read (`--region ssu` / `--region lsu`, requires a full 4-anchor chain)
 - **FASTA and FASTQ support** — reads gzipped or uncompressed inputs; preserves quality scores when outputting FASTQ
 
 ## Quick start
@@ -71,6 +71,23 @@ itsxrust extract \
 ```
 
 This produces `results/sample1.its1.fasta`, `results/sample1.its2.fasta`, and `results/sample1.full.fasta`.
+
+### SSU / LSU export
+
+For long reads that span the full operon (SSU → ITS1 → 5.8S → ITS2 → LSU), the conserved flanks captured upstream and downstream of the ITS region can be exported with `--region ssu` and `--region lsu`:
+
+```bash
+itsxrust extract \
+  --input reads.fastq.gz \
+  --hmm F.hmm \
+  --output ssu.fasta \
+  --region ssu \
+  --preset ont
+```
+
+The output is the portion of the SSU/LSU gene **captured in the read, bounded by the conserved HMM anchor** — substantial on a full-operon long read, a sliver on a short ITS amplicon — not a curated 18S/28S gene. Both regions require a successful full 4-anchor chain; there is no partial-chain fallback for the flanks.
+
+By construction, `SSU ++ FULL ++ LSU` reconstructs the original read (or its reverse complement, for minus-strand reads), which is what the integration test suite verifies.
 
 ## Install
 
@@ -144,7 +161,7 @@ itsxrust extract --help
 | `--input` | Input FASTA/FASTQ (`.gz` OK) | required |
 | `--hmm` | HMM profile file | required (unless `--tblout-existing`) |
 | `--output` | Output file (single region) or prefix (`--region all`) | required |
-| `--region` | `its1`, `its2`, `full`, or `all` | `full` |
+| `--region` | `its1`, `its2`, `full`, `ssu`, `lsu`, or `all` | `full` |
 | `--preset` | `ont` or `hifi` — sets E-value, constraints, confidence thresholds | — |
 | `--hmmer-cpu` | Threads for nhmmer | 8 |
 | `--inc-e` | E-value inclusion threshold | 1e-5 (ont: 1e-3, hifi: 1e-10) |
@@ -196,7 +213,7 @@ itsxrust extract --input reads.fq --hmm F.hmm --output out.fasta \
 
 The JSON includes total reads, kept/skipped counts with reason-code breakdowns, confidence classification counts, dereplication stats (if `--derep`), and the effective parameters used.
 
-Use `--anchors-tsv` or `--anchors-jsonl` to export per-read anchor hit coordinates, confidence labels, and ambiguous-reason annotations for reads that produced a valid chain.
+Use `--anchors-tsv` or `--anchors-jsonl` to export per-read anchor hit coordinates, confidence labels, and ambiguous-reason annotations for reads that produced a valid chain. The `selected` column reflects the bounds for whatever `--region` was requested, including `ssu` and `lsu`.
 
 ## Inputs / outputs
 
@@ -233,6 +250,7 @@ bench/         Benchmarking + simulation harness
 ## Roadmap
 
 - ~~Bioconda recipe~~ ✅
+- ~~SSU / LSU flank export~~ ✅
 - In-process HMM bindings (replace nhmmer subprocess)
 
 ## License

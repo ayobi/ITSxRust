@@ -132,3 +132,81 @@ fn minus_strand_full_matches_expected_revcomp_slice() {
     assert_eq!(got.len(), expected.len());
     assert_eq!(got, &expected);
 }
+
+#[test]
+fn ssu_lsu_export_reconstructs_subset_reads() {
+    let td = tempdir().unwrap();
+    let ssu_out = td.path().join("out.ssu.fasta");
+    let full_out = td.path().join("out.full.fasta");
+    let lsu_out = td.path().join("out.lsu.fasta");
+
+    for (region, out) in [
+        ("ssu", &ssu_out),
+        ("full", &full_out),
+        ("lsu", &lsu_out),
+    ] {
+        let status = Command::new(env!("CARGO_BIN_EXE_itsxrust"))
+            .args([
+                "extract",
+                "--input",
+                "testdata/subset.fasta",
+                "--tblout-existing",
+                "testdata/subset.tblout",
+                "--output",
+                out.to_str().unwrap(),
+                "--region",
+                region,
+            ])
+            .status()
+            .unwrap();
+        assert!(status.success(), "extraction failed for region {}", region);
+    }
+
+    // SSU/LSU export is tied to a successful full 4-anchor chain (no partial
+    // fallback for the flanks), so both files should contain exactly the
+    // full-chain reads from the subset.
+    assert_eq!(count_fasta_headers(&ssu_out), 763);
+    assert_eq!(count_fasta_headers(&lsu_out), 763);
+
+    let orig = read_fasta_as_map(std::path::Path::new("testdata/subset.fasta"));
+    let ssu = read_fasta_as_map(&ssu_out);
+    let full = read_fasta_as_map(&full_out);
+    let lsu = read_fasta_as_map(&lsu_out);
+
+    // Reconstruction invariant:
+    //   SSU = [1, ssu_end], FULL = [ssu_end+1, lsu_start-1], LSU = [lsu_start, len]
+    // so SSU ++ FULL ++ LSU must equal the original read (+ strand) or its
+    // reverse complement (- strand, since each region is emitted already RC'd).
+    let mut ok_fwd = 0usize;
+    let mut ok_rev = 0usize;
+    let mut bad: Vec<String> = Vec::new();
+
+    for rid in ssu.keys() {
+        let (Some(f), Some(l), Some(o)) =
+            (full.get(rid), lsu.get(rid), orig.get(rid))
+        else {
+            continue;
+        };
+        let recon = format!("{}{}{}", &ssu[rid], f, l);
+        if &recon == o {
+            ok_fwd += 1;
+        } else if recon == revcomp_dna(o) {
+            ok_rev += 1;
+        } else {
+            bad.push(rid.clone());
+        }
+    }
+
+    assert!(
+        bad.is_empty(),
+        "{} reads failed SSU+FULL+LSU reconstruction (first few: {:?}); ok_fwd={}, ok_rev={}",
+        bad.len(),
+        bad.iter().take(5).collect::<Vec<_>>(),
+        ok_fwd,
+        ok_rev
+    );
+    // Both strands should be exercised by the subset (your existing
+    // minus_strand_full_matches_expected_revcomp_slice already proves '-' reads exist here).
+    assert!(ok_fwd > 0, "expected some + strand reads in the subset");
+    assert!(ok_rev > 0, "expected some - strand reads in the subset");
+}
