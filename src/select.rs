@@ -14,6 +14,8 @@ pub enum Region {
     Full,
     Its1,
     Its2,
+    Ssu,
+    Lsu,
     All,
 }
 
@@ -436,6 +438,30 @@ pub fn bounds_from_chain(chain: &[HitIvl; 4], region: Region) -> Option<(i64, i6
                 None
             }
         }
+        // SSU / LSU export: the portion of the flanking gene captured in the
+        // read, bounded by the anchor. NOTE: this is read-flank sequence up to
+        // the conserved anchor, not a curated 18S/28S gene — substantial on a
+        // full-operon long read, a sliver on a short ITS amplicon.
+        Region::Ssu => {
+            // Read start through the SSU_end anchor (i.e. everything 5' of ITS1).
+            let start = 1;
+            let end = ssu.ivl.end;
+            if start <= end {
+                Some((start, end))
+            } else {
+                None
+            }
+        }
+        Region::Lsu => {
+            // LSU_start anchor through read end (i.e. everything 3' of ITS2).
+            let start = lsu.ivl.start;
+            let end = lsu.seq_len;
+            if start <= end {
+                Some((start, end))
+            } else {
+                None
+            }
+        }
         Region::All => None,
     }
 }
@@ -517,4 +543,36 @@ pub fn diagnose_structured(
     }
 
     SkipReason::TrimFailed
+}
+
+#[cfg(test)]
+mod region_export_tests {
+    use super::*;
+    fn h(anchor: Anchor, start: i64, end: i64) -> HitIvl {
+        HitIvl { anchor, ivl: Interval { start, end }, score: 50.0, evalue: 1e-20,
+                 strand: '+', model: "x".to_string(), seq_len: 400 }
+    }
+    fn chain() -> [HitIvl; 4] {
+        [ h(Anchor::SsuEnd, 1, 20), h(Anchor::S58Start, 120, 140),
+          h(Anchor::S58End, 160, 180), h(Anchor::LsuStart, 330, 350) ]
+    }
+    #[test]
+    fn ssu_is_read_start_to_ssu_anchor_end() {
+        assert_eq!(bounds_from_chain(&chain(), Region::Ssu), Some((1, 20)));
+    }
+    #[test]
+    fn lsu_is_lsu_anchor_start_to_read_end() {
+        assert_eq!(bounds_from_chain(&chain(), Region::Lsu), Some((330, 400)));
+    }
+    #[test]
+    fn ssu_full_lsu_partition_the_read_without_gap_or_overlap() {
+        let c = chain();
+        let ssu = bounds_from_chain(&c, Region::Ssu).unwrap();
+        let full = bounds_from_chain(&c, Region::Full).unwrap();
+        let lsu = bounds_from_chain(&c, Region::Lsu).unwrap();
+        assert_eq!(ssu.1 + 1, full.0);   // SSU abuts FULL
+        assert_eq!(full.1 + 1, lsu.0);   // FULL abuts LSU
+        assert_eq!(ssu.0, 1);
+        assert_eq!(lsu.1, 400);
+    }
 }

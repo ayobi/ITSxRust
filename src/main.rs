@@ -96,7 +96,7 @@ enum Commands {
         #[arg(long)]
         inc_e: Option<f64>,
 
-        /// Region to extract: full (default), its1, its2, all
+        /// Region to extract: full (default), its1, its2, ssu, lsu, all
         #[arg(long, default_value = "full")]
         region: String,
 
@@ -511,10 +511,12 @@ fn main() -> Result<()> {
                 "full" => select::Region::Full,
                 "its1" => select::Region::Its1,
                 "its2" => select::Region::Its2,
+                "ssu" => select::Region::Ssu,
+                "lsu" => select::Region::Lsu,
                 "all" => select::Region::All,
                 other => {
                     return Err(anyhow!(
-                        "Invalid --region '{}'. Use full|its1|its2|all",
+                        "Invalid --region '{}'. Use full|its1|its2|ssu|lsu|all",
                         other
                     ));
                 }
@@ -914,6 +916,9 @@ fn main() -> Result<()> {
                         select::Region::Its1 => pb.its1.as_ref(),
                         select::Region::Its2 => pb.its2.as_ref(),
                         select::Region::Full => pb.full.as_ref(),
+                        // SSU/LSU export requires a full 4-anchor chain; there is
+                        // no 2-anchor partial fallback for the flanks.
+                        select::Region::Ssu | select::Region::Lsu => None,
                         select::Region::All => None, // handled by is_all branch
                     };
                     if let Some(p) = pair {
