@@ -140,11 +140,7 @@ fn ssu_lsu_export_reconstructs_subset_reads() {
     let full_out = td.path().join("out.full.fasta");
     let lsu_out = td.path().join("out.lsu.fasta");
 
-    for (region, out) in [
-        ("ssu", &ssu_out),
-        ("full", &full_out),
-        ("lsu", &lsu_out),
-    ] {
+    for (region, out) in [("ssu", &ssu_out), ("full", &full_out), ("lsu", &lsu_out)] {
         let status = Command::new(env!("CARGO_BIN_EXE_itsxrust"))
             .args([
                 "extract",
@@ -182,9 +178,7 @@ fn ssu_lsu_export_reconstructs_subset_reads() {
     let mut bad: Vec<String> = Vec::new();
 
     for rid in ssu.keys() {
-        let (Some(f), Some(l), Some(o)) =
-            (full.get(rid), lsu.get(rid), orig.get(rid))
-        else {
+        let (Some(f), Some(l), Some(o)) = (full.get(rid), lsu.get(rid), orig.get(rid)) else {
             continue;
         };
         let recon = format!("{}{}{}", &ssu[rid], f, l);

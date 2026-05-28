@@ -549,12 +549,23 @@ pub fn diagnose_structured(
 mod region_export_tests {
     use super::*;
     fn h(anchor: Anchor, start: i64, end: i64) -> HitIvl {
-        HitIvl { anchor, ivl: Interval { start, end }, score: 50.0, evalue: 1e-20,
-                 strand: '+', model: "x".to_string(), seq_len: 400 }
+        HitIvl {
+            anchor,
+            ivl: Interval { start, end },
+            score: 50.0,
+            evalue: 1e-20,
+            strand: '+',
+            model: "x".to_string(),
+            seq_len: 400,
+        }
     }
     fn chain() -> [HitIvl; 4] {
-        [ h(Anchor::SsuEnd, 1, 20), h(Anchor::S58Start, 120, 140),
-          h(Anchor::S58End, 160, 180), h(Anchor::LsuStart, 330, 350) ]
+        [
+            h(Anchor::SsuEnd, 1, 20),
+            h(Anchor::S58Start, 120, 140),
+            h(Anchor::S58End, 160, 180),
+            h(Anchor::LsuStart, 330, 350),
+        ]
     }
     #[test]
     fn ssu_is_read_start_to_ssu_anchor_end() {
@@ -570,8 +581,8 @@ mod region_export_tests {
         let ssu = bounds_from_chain(&c, Region::Ssu).unwrap();
         let full = bounds_from_chain(&c, Region::Full).unwrap();
         let lsu = bounds_from_chain(&c, Region::Lsu).unwrap();
-        assert_eq!(ssu.1 + 1, full.0);   // SSU abuts FULL
-        assert_eq!(full.1 + 1, lsu.0);   // FULL abuts LSU
+        assert_eq!(ssu.1 + 1, full.0); // SSU abuts FULL
+        assert_eq!(full.1 + 1, lsu.0); // FULL abuts LSU
         assert_eq!(ssu.0, 1);
         assert_eq!(lsu.1, 400);
     }
