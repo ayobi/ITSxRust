@@ -8,6 +8,7 @@ authors:
 license: "MIT"
 repository-code: "https://github.com/ayobi/ITSxRust"
 url: "https://github.com/ayobi/ITSxRust"
+doi: "10.5281/zenodo.21651462"
 version: "0.3.0"
 date-released: "2026-07-28"
 keywords:

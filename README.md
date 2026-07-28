@@ -16,6 +16,7 @@
   <a href="https://github.com/ayobi/ITSxRust/actions"><img src="https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <a href="https://doi.org/10.64898/2026.02.25.707950"><img src="https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv" alt="bioRxiv"></a>
+  <a href="https://doi.org/10.5281/zenodo.21651462"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21651462-1682D4?logo=zenodo" alt="DOI"></a>
   <a href="https://nf-co.re/ampliseq"><img src="https://img.shields.io/badge/nf--core-ampliseq-1a9655?logo=nfcore" alt="nf-core/ampliseq"></a>
 </p>
 
