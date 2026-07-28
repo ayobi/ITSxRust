@@ -2,7 +2,7 @@
 
 use anyhow::{Context, Result};
 use std::cmp::Ordering;
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap};
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
@@ -127,6 +127,14 @@ pub struct StreamStats {
     pub anchor_hits: u64,       // hits that matched an anchor + strand
     pub stored_hits: u64,       // final stored hits across all reads/bins
     pub reads: usize,           // reads with >=1 anchor hit
+
+    /// Hits whose profile name did not map to any of the four anchor types.
+    /// Non-zero means the supplied HMM set uses names this build does not
+    /// recognise, and anchors will be silently under-detected rather than
+    /// reported as an error.
+    pub unclassified_hits: u64,
+    /// Up to 10 distinct unrecognised profile names, for the warning message.
+    pub unclassified_models: Vec<String>,
 }
 
 /// Stream tblout line-by-line and keep only Top-K per (anchor × strand) per read.
@@ -145,6 +153,8 @@ pub fn stream_topk_tblout(
     let mut map: HashMap<String, TopKHits> = HashMap::new();
     let mut total_tblout_hits: u64 = 0;
     let mut anchor_hits: u64 = 0;
+    let mut unclassified_hits: u64 = 0;
+    let mut unclassified_models: BTreeSet<String> = BTreeSet::new();
 
     let mut line = String::new();
     loop {
@@ -166,6 +176,10 @@ pub fn stream_topk_tblout(
         }
 
         let Some(anchor) = select::classify(&hit.model) else {
+            unclassified_hits += 1;
+            if unclassified_models.len() < 10 {
+                unclassified_models.insert(hit.model.clone());
+            }
             continue;
         };
 
@@ -184,6 +198,8 @@ pub fn stream_topk_tblout(
         anchor_hits,
         stored_hits,
         reads: map.len(),
+        unclassified_hits,
+        unclassified_models: unclassified_models.into_iter().collect(),
     };
 
     Ok((map, stats))

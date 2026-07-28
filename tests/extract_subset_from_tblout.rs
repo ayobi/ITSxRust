@@ -181,7 +181,7 @@ fn ssu_lsu_export_reconstructs_subset_reads() {
         let (Some(f), Some(l), Some(o)) = (full.get(rid), lsu.get(rid), orig.get(rid)) else {
             continue;
         };
-        let recon = format!("{}{}{}", &ssu[rid], f, l);
+        let recon = format!("{}{}{}", ssu[rid], f, l);
         if &recon == o {
             ok_fwd += 1;
         } else if recon == revcomp_dna(o) {

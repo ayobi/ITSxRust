@@ -8,8 +8,8 @@ authors:
 license: "MIT"
 repository-code: "https://github.com/ayobi/ITSxRust"
 url: "https://github.com/ayobi/ITSxRust"
-version: "0.1.0"
-date-released: "2026-02-13"
+version: "0.3.0"
+date-released: "2026-07-28"
 keywords:
   - ITS
   - fungi
@@ -18,12 +18,14 @@ keywords:
   - PacBio
   - amplicon
 preferred-citation:
-  type: software
+  type: article
+  doi: "10.64898/2026.02.25.707950"
+  journal: "bioRxiv"
   authors:
     - family-names: "O'Brien"
       given-names: "Aaron"
   title: "ITSxRust"
-  version: "0.1.0"
-  date-released: "2026-02-13"
+  version: "0.3.0"
+  date-released: "2026-07-28"
   url: "https://github.com/ayobi/ITSxRust"
   repository-code: "https://github.com/ayobi/ITSxRust"

@@ -11,7 +11,7 @@ mod seq;
 mod tblout;
 mod trim;
 
-use anyhow::{Result, anyhow};
+use anyhow::{Context, Result, anyhow};
 use clap::{Parser, Subcommand, ValueEnum};
 use rayon::prelude::*;
 use serde::Serialize;
@@ -153,6 +153,12 @@ enum Commands {
         /// Exact dereplication: search only unique sequences, project results to duplicates
         #[arg(long, default_value_t = false)]
         derep: bool,
+
+        /// Emit output sequences with the input read ID unchanged, omitting the
+        /// default `|<region>:<start>-<end>` coordinate suffix. Use when joining
+        /// output back to input on read ID.
+        #[arg(long)]
+        plain_ids: bool,
     },
 }
 
@@ -295,6 +301,23 @@ impl AnchorHitOut {
 }
 
 #[allow(clippy::too_many_arguments)]
+/// True if the file contains at least one FASTA record. Short-circuits on the
+/// first header line, so this is O(1) for any non-empty input.
+fn fasta_has_records(path: &std::path::Path) -> Result<bool> {
+    use std::io::BufRead;
+    let f =
+        std::fs::File::open(path).with_context(|| format!("Failed to open {}", path.display()))?;
+    for line in std::io::BufReader::new(f).lines() {
+        if line?.starts_with('>') {
+            return Ok(true);
+        }
+    }
+    Ok(false)
+}
+
+// Ten fields: one column group per anchor plus bounds and labels. Bundling
+// them into a struct is the tidier fix but touches every call site.
+#[allow(clippy::too_many_arguments)]
 fn write_anchor_tsv_row<W: Write>(
     w: &mut W,
     rid: &str,
@@ -420,6 +443,7 @@ fn main() -> Result<()> {
             write_ambiguous,
             qc_json,
             derep,
+            plain_ids,
         } => {
             // ---------------------------------------------------------------
             // Resolve preset → effective parameters
@@ -658,6 +682,17 @@ fn main() -> Result<()> {
                     }
                 };
 
+                // An empty input makes nhmmer fail with an opaque
+                // "Failed to autodetect format" error; catch it here instead.
+                if !fasta_has_records(&fasta_target)? {
+                    anyhow::bail!(
+                        "Input contained no sequence records: {}\n\
+                         If this file came from an upstream pipeline step, check that \
+                         the step succeeded before rerunning.",
+                        input.display()
+                    );
+                }
+
                 hmmer::run_nhmmer(&hmmer::HmmerArgs {
                     hmm: hmm_path,
                     fasta: &fasta_target,
@@ -678,6 +713,17 @@ fn main() -> Result<()> {
                 "tblout hits parsed: {} | anchor hits: {} | stored(topK): {} | reads w/anchor hits: {}",
                 stats.total_tblout_hits, stats.anchor_hits, stats.stored_hits, stats.reads
             );
+            if stats.unclassified_hits > 0 {
+                eprintln!(
+                    "WARNING: {} tblout hits came from {} profile name(s) that do not map to \
+                     any of the four anchor types (SSU 3'end, 5.8S 5'start, 5.8S 3'end, \
+                     LSU 5'start) and were ignored. Anchors may be under-detected. \
+                     Unrecognised name(s): {}",
+                    stats.unclassified_hits,
+                    stats.unclassified_models.len(),
+                    stats.unclassified_models.join(", ")
+                );
+            }
 
             // Expand dereplicated hits
             if let Some(ref dr) = derep_result {
@@ -1014,6 +1060,7 @@ fn main() -> Result<()> {
                     eff_max_per_anchor,
                     eff_constraints,
                     explain,
+                    plain_ids,
                 )?;
 
                 eprintln!("Wrote outputs:");
@@ -1050,6 +1097,7 @@ fn main() -> Result<()> {
                     eff_max_per_anchor,
                     eff_constraints,
                     explain,
+                    plain_ids,
                 )?;
 
                 eprintln!("Wrote output: {}", output.display());
@@ -1114,6 +1162,8 @@ fn main() -> Result<()> {
                         anchor_hits: stats.anchor_hits,
                         stored_topk: stats.stored_hits,
                         reads_with_hits: stats.reads,
+                        unclassified_hits: stats.unclassified_hits,
+                        unclassified_models: stats.unclassified_models.clone(),
                     },
                     params: report::ParamsSummary {
                         preset: preset.map(|p| match p {
