@@ -1,7 +1,7 @@
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="assets/itsxrust-logo-dark.png">
-    <img alt="ITSxRust" src="assets/itsxrust-logo-dark.png" width="480">
+    <img alt="ITSxRust" src="assets/itsxrust-logo.png" width="480">
   </picture>
 </p>
 
