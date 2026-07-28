@@ -134,11 +134,18 @@ fn extract_trimmed(rec: &Record, plan: &ExtractPlan) -> Option<(String, Option<S
     }
 }
 
-fn trimmed_id(read_id: &str, region_tag: &str, plan: &ExtractPlan) -> String {
-    format!(
-        "{}|{}:{}-{}",
-        read_id, region_tag, plan.norm_start, plan.norm_end
-    )
+fn trimmed_id(read_id: &str, region_tag: &str, plan: &ExtractPlan, plain_ids: bool) -> String {
+    // The default appends `|<region>:<start>-<end>` so coordinates travel with
+    // the sequence. Anything joining on read ID downstream has to strip it, so
+    // --plain-ids emits the input ID unchanged.
+    if plain_ids {
+        read_id.to_string()
+    } else {
+        format!(
+            "{}|{}:{}-{}",
+            read_id, region_tag, plan.norm_start, plan.norm_end
+        )
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -226,6 +233,7 @@ pub fn trim_all(
     max_per_anchor: usize,
     constraints: select::Constraints,
     explain: usize,
+    plain_ids: bool,
 ) -> Result<TrimStats> {
     let mut outputs = [
         RegionOutput {
@@ -268,7 +276,7 @@ pub fn trim_all(
                 if let Some(plan) = maybe_plan
                     && let Some((out_seq, out_qual)) = extract_trimmed(&rec, plan)
                 {
-                    let out_id = trimmed_id(&rec.id, outputs[i].tag, plan);
+                    let out_id = trimmed_id(&rec.id, outputs[i].tag, plan, plain_ids);
                     outputs[i]
                         .writer
                         .write_record(&out_id, &out_seq, out_qual.as_deref())?;
@@ -327,6 +335,7 @@ pub fn trim_single(
     max_per_anchor: usize,
     constraints: select::Constraints,
     explain: usize,
+    plain_ids: bool,
 ) -> Result<TrimStats> {
     let mut w = SeqWriter::open(out_path, out_fmt)?;
     let mut stats = TrimStats::default();
@@ -349,7 +358,7 @@ pub fn trim_single(
             }
 
             if let Some((out_seq, out_qual)) = extract_trimmed(&rec, plan) {
-                let out_id = trimmed_id(&rec.id, region_tag, plan);
+                let out_id = trimmed_id(&rec.id, region_tag, plan, plain_ids);
                 w.write_record(&out_id, &out_seq, out_qual.as_deref())?;
                 stats.kept_any += 1;
                 continue;

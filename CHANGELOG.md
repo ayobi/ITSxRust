@@ -6,7 +6,26 @@ The format is based on Keep a Changelog, and this project follows Semantic Versi
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-28
+
+### Added
+- `--region ssu` and `--region lsu` for flanking ribosomal gene export.
+- `--plain-ids` to emit output with the input read ID unchanged, omitting the
+  default `|<region>:<start>-<end>` suffix, for joining output back to input.
+- Unrecognised profile names are counted, sampled and reported on stderr and in
+  the QC JSON (`tblout.unclassified_hits`, `tblout.unclassified_models`), so a
+  mismatched HMM set fails loudly rather than under-detecting anchors silently.
+
+### Fixed
+- Peak memory reduced ~6x on large inputs. `nhmmer`'s human-readable stdout
+  report was being buffered in full and discarded; it scaled with reported hits
+  at ~464 B/hit and accounted for 5.98 GB of a 7.07 GB peak RSS on a 230 Mbp
+  input. Extraction results are unchanged.
+- Empty input now reports "no sequence records" instead of an opaque `nhmmer`
+  format-autodetection failure.
+
 ## [0.1.0] - 2026-02-13
+
 ### Added
 - Initial release of ITSxRust.
 - `extract` command for ITS region extraction using HMMER tblout anchors.

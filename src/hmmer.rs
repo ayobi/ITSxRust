@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use std::path::Path;
-use std::process::Command;
+use std::process::{Command, Stdio};
 
 pub struct HmmerArgs<'a> {
     pub hmm: &'a Path,
@@ -17,6 +17,12 @@ pub struct HmmerArgs<'a> {
 }
 
 pub fn run_nhmmer(args: &HmmerArgs) -> Result<()> {
+    // nhmmer writes a human-readable report to stdout in addition to --tblout.
+    // Capturing that stream (Command::output()) buffers the whole report in
+    // memory and it scales with the number of *reported* hits: measured at
+    // ~464 B/hit, it accounted for 5.98 GB of a 7.07 GB peak RSS on a 230 Mbp
+    // input, versus 1.09 GB for the identical parse from a pre-computed tblout.
+    // We only ever read --tblout, so discard stdout and keep stderr for errors.
     let output = Command::new("nhmmer")
         .arg("--cpu")
         .arg(args.cpu.to_string())
@@ -31,14 +37,17 @@ pub fn run_nhmmer(args: &HmmerArgs) -> Result<()> {
         .arg(args.tblout)
         .arg(args.hmm)
         .arg(args.fasta)
-        .output()
-        .with_context(|| "Failed to spawn `nhmmer`. Is your conda env active?")?;
+        .stdout(Stdio::null())
+        .stderr(Stdio::piped())
+        .spawn()
+        .with_context(|| "Failed to spawn `nhmmer`. Is your conda env active?")?
+        .wait_with_output()
+        .with_context(|| "`nhmmer` terminated abnormally")?;
 
     if !output.status.success() {
         return Err(anyhow!(
-            "nhmmer failed (exit={:?})\n--- stdout ---\n{}\n--- stderr ---\n{}",
+            "nhmmer failed (exit={:?})\n--- stderr ---\n{}",
             output.status.code(),
-            String::from_utf8_lossy(&output.stdout),
             String::from_utf8_lossy(&output.stderr),
         ));
     }

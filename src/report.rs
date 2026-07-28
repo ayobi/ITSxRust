@@ -154,6 +154,17 @@ pub struct TbloutSummary {
     pub anchor_hits: u64,
     pub stored_topk: u64,
     pub reads_with_hits: usize,
+
+    /// Omitted when zero, so the existing JSON schema is unchanged for runs
+    /// using a recognised profile set.
+    #[serde(skip_serializing_if = "is_zero")]
+    pub unclassified_hits: u64,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub unclassified_models: Vec<String>,
+}
+
+fn is_zero(n: &u64) -> bool {
+    *n == 0
 }
 
 #[derive(Serialize)]
