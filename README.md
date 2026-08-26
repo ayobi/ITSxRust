@@ -15,8 +15,7 @@
   <a href="https://github.com/ayobi/ITSxRust/releases"><img src="https://img.shields.io/github/v/release/ayobi/ITSxRust" alt="GitHub Release"></a>
   <a href="https://github.com/ayobi/ITSxRust/actions"><img src="https://github.com/ayobi/ITSxRust/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <a href="https://doi.org/10.64898/2026.02.25.707950"><img src="https://img.shields.io/badge/bioRxiv-10.64898%2F2026.02.25.707950-b31b1b?logo=biorxiv" alt="bioRxiv"></a>
-  <a href="https://doi.org/10.5281/zenodo.21651462"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21651462-1682D4?logo=zenodo" alt="DOI"></a>
+  <a href="https://doi.org/10.1111/2041-210X.70393"><img src="https://img.shields.io/badge/Methods%20Ecol%20Evol-10.1111%2F2041--210X.70393-1a7f5a" alt="Methods in Ecology and Evolution></a><a href="https://doi.org/10.5281/zenodo.21651462"><img src="https://img.shields.io/badge/DOI-10.5281%2Fzenodo.21651462-1682D4?logo=zenodo" alt="DOI"></a>
   <a href="https://nf-co.re/ampliseq"><img src="https://img.shields.io/badge/nf--core-ampliseq-1a9655?logo=nfcore" alt="nf-core/ampliseq"></a>
 </p>
 
